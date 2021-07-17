@@ -22,18 +22,22 @@ defmodule ReportsGenerator do
     |> Enum.reduce(report_accumulator(), fn line, report -> sum_values(line, report) end)
   end
 
-  defp sum_values([id, food_name, price], %{"users" => users, "foods" => foods} = report) do
-    users = Map.put(users, id, users[id] + price)
-    foods = Map.put(foods, food_name, foods[food_name] + 1)
-
-    %{report | "users" => users, "foods" => foods}
+  def build_from_many(filemanes) when not is_list(filemanes) do
+    {:error, "Please provide a list of filenames"}
   end
 
-  def fetch_higher_value(report) do
-    {:ok, user_higher_value} = fetch_higher_value(report, "users")
-    {:ok, food_higher_value} = fetch_higher_value(report, "foods")
+  def build_from_many(filenames) do
+    result =
+      filenames
+      |> Task.async_stream(fn filename -> build(filename) end)
+      |> Enum.reduce(
+        report_accumulator(),
+        fn {:ok, result}, report ->
+          sum_reports(result, report)
+        end
+      )
 
-    {:ok, %{"user" => user_higher_value, "food" => food_higher_value}}
+    {:ok, result}
   end
 
   def fetch_higher_value(report, option) when option in @options do
@@ -43,6 +47,31 @@ defmodule ReportsGenerator do
   end
 
   def fetch_higher_value(_report, _option), do: {:error, "Invalid option"}
+
+  def fetch_higher_value(report) do
+    {:ok, user_higher_value} = fetch_higher_value(report, "users")
+    {:ok, food_higher_value} = fetch_higher_value(report, "foods")
+
+    {:ok, %{"user" => user_higher_value, "food" => food_higher_value}}
+  end
+
+  defp sum_values([id, food_name, price], %{"users" => users, "foods" => foods}) do
+    users = Map.put(users, id, users[id] + price)
+    foods = Map.put(foods, food_name, foods[food_name] + 1)
+
+    %{"users" => users, "foods" => foods}
+  end
+
+  defp sum_reports(%{"foods" => foods_a, "users" => users_a}, %{"foods" => foods_b, "users" => users_b}) do
+    foods = merge_maps(foods_a, foods_b)
+    users = merge_maps(users_a, users_b)
+
+    %{"users" => users, "foods" => foods}
+  end
+
+  defp merge_maps(map_a, map_b) do
+    Map.merge(map_a, map_b, fn _key, value_a, value_b -> value_a + value_b end)
+  end
 
   defp report_accumulator do
     foods = Enum.into(@availabe_foods, %{}, fn food -> {food, 0} end)
