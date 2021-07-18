@@ -62,6 +62,23 @@ defmodule ReportsGenerator do
     {:ok, result}
   end
 
+  @doc """
+    Fetches the highest value in the chosen collection according with the given option
+
+    ## Parameters
+    - report: A complete report built with the build/1 or build_from_many/1 functions
+    - option: A string that indicates in which collection the highest value must be fetched. The valid options are "users" and "foods"\n
+
+    ## Examples
+    \tiex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value("users")
+    \t{:ok, {"5", 49}}
+
+    \tiex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value("foods")
+    \t{:ok, {"esfirra", 3}}
+
+    \tiex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value("banana")
+    \t{:error, "Invalid option"}
+  """
   def fetch_highest_value(report, option) when option in @options do
     result = Enum.max_by(report[option], fn {_key, value} -> value end)
 
