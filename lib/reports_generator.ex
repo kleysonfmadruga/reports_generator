@@ -62,19 +62,19 @@ defmodule ReportsGenerator do
     {:ok, result}
   end
 
-  def fetch_higher_value(report, option) when option in @options do
+  def fetch_highest_value(report, option) when option in @options do
     result = Enum.max_by(report[option], fn {_key, value} -> value end)
 
     {:ok, result}
   end
 
-  def fetch_higher_value(_report, _option), do: {:error, "Invalid option"}
+  def fetch_highest_value(_report, _option), do: {:error, "Invalid option"}
 
-  def fetch_higher_value(report) do
-    {:ok, user_higher_value} = fetch_higher_value(report, "users")
-    {:ok, food_higher_value} = fetch_higher_value(report, "foods")
+  def fetch_highest_value(report) do
+    {:ok, user_highest_value} = fetch_highest_value(report, "users")
+    {:ok, food_highest_value} = fetch_highest_value(report, "foods")
 
-    {:ok, %{"user" => user_higher_value, "food" => food_higher_value}}
+    {:ok, %{"user" => user_highest_value, "food" => food_highest_value}}
   end
 
   defp sum_values([id, food_name, price], %{"users" => users, "foods" => foods}) do
