@@ -3,7 +3,7 @@ defmodule ReportsGenerator do
     Provides functions to generate reports of food consumption, to get the most consumed food and the user who has the highest amount spent
   """
 
-  @availabe_foods [
+  @available_foods [
     "açaí",
     "churrasco",
     "esfirra",
@@ -113,7 +113,7 @@ defmodule ReportsGenerator do
   end
 
   defp report_accumulator do
-    foods = Enum.into(@availabe_foods, %{}, fn food -> {food, 0} end)
+    foods = Enum.into(@available_foods, %{}, fn food -> {food, 0} end)
     users = Enum.into(1..30, %{}, fn id -> {Integer.to_string(id), 0} end)
 
     %{"users" => users, "foods" => foods}
