@@ -1,5 +1,7 @@
 defmodule ReportsGenerator do
-  @moduledoc false
+  @moduledoc """
+    Provides functions to generate reports of food consumption, to get the most consumed food and the user who has the highest amount spent
+  """
 
   @availabe_foods [
     "açaí",
@@ -16,12 +18,32 @@ defmodule ReportsGenerator do
 
   alias ReportsGenerator.Parser
 
+  @doc """
+    Builds the complete report of food consumption and users spendings from a single file
+
+    ## Parameters
+    filename: Name of the CSV file in the /reports folder
+
+    ## Examples
+    \tiex> ReportsGenerator.build("report_test.csv")
+    \t%{"foods" => %{...}, "users" => %{...}}
+  """
   def build(filename) do
     filename
     |> Parser.parse_file()
     |> Enum.reduce(report_accumulator(), fn line, report -> sum_values(line, report) end)
   end
 
+  @doc """
+    Builds the complete report of food consumption and users spendings from multiple files
+
+    ## Parameters
+    filenames: List of names of the CSV files in the /reports folder
+
+    ## Examples
+    \tiex> ReportsGenerator.build_from_many(["report_1.csv", "report_2.csv", "report_3.csv"])
+    \t%{"foods" => %{...}, "users" => %{...}}
+  """
   def build_from_many(filemanes) when not is_list(filemanes) do
     {:error, "Please provide a list of filenames"}
   end
