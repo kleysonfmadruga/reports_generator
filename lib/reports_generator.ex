@@ -22,11 +22,11 @@ defmodule ReportsGenerator do
     Builds the complete report of food consumption and users spendings from a single file
 
     ## Parameters
-    filename: Name of the CSV file in the /reports folder
+    - filename: Name of the CSV file in the /reports folder\n
 
     ## Examples
-    \tiex> ReportsGenerator.build("report_test.csv")
-    \t%{"foods" => %{...}, "users" => %{...}}
+      iex> ReportsGenerator.build("report_test.csv")
+      %{"foods" => %{...}, "users" => %{...}}
   """
   def build(filename) do
     filename
@@ -38,11 +38,11 @@ defmodule ReportsGenerator do
     Builds the complete report of food consumption and users spendings from multiple files
 
     ## Parameters
-    filenames: List of names of the CSV files in the /reports folder
+    - filenames: List of names of the CSV files in the /reports folder\n
 
     ## Examples
-    \tiex> ReportsGenerator.build_from_many(["report_1.csv", "report_2.csv", "report_3.csv"])
-    \t%{"foods" => %{...}, "users" => %{...}}
+      iex> ReportsGenerator.build_from_many(["report_1.csv", "report_2.csv", "report_3.csv"])
+      %{"foods" => %{...}, "users" => %{...}}
   """
   def build_from_many(filemanes) when not is_list(filemanes) do
     {:error, "Please provide a list of filenames"}
@@ -67,17 +67,20 @@ defmodule ReportsGenerator do
 
     ## Parameters
     - report: A complete report built with the build/1 or build_from_many/1 functions
-    - option: A string that indicates in which collection the highest value must be fetched. The valid options are "users" and "foods"\n
+    - option: A string that indicates in which collection the highest value must be fetched. The valid options are "users" (default option) and "foods"\n
 
     ## Examples
-    \tiex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value("users")
-    \t{:ok, {"5", 49}}
+      iex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value("users")
+      {:ok, {"5", 49}}
 
-    \tiex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value("foods")
-    \t{:ok, {"esfirra", 3}}
+      iex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value()
+      {:ok, {"5", 49}}
 
-    \tiex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value("banana")
-    \t{:error, "Invalid option"}
+      iex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value("foods")
+      {:ok, {"esfirra", 3}}
+
+      iex> ReportsGenerator.build("report_test.csv") |> ReportsGenerator.fetch_highest_value("banana")
+      {:error, "Invalid option"}
   """
   def fetch_highest_value(report, option) when option in @options do
     result = Enum.max_by(report[option], fn {_key, value} -> value end)
